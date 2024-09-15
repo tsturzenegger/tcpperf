@@ -31,39 +31,7 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
-
-  update-docs:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up toolchain
-        run: rustup toolchain install stable --profile minimal
-      - name: Set up cache
-        uses: Swatinem/rust-cache@v2
-        with: 
-          shared-key: "-"
-          key: "-"
-          cache-all-crates: true
-      - name: Generate Documentation
-        run: cargo doc --no-deps
-      - name: Commit Documentation
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add -f target/doc
-          if git diff --staged --quiet; then
-            echo "No changes in documentation to commit."
-          else
-            git checkout -b update-docs-$(date +%Y%m%d-%H%M%S)
-            git commit -m "Generate and commit documentation"
-            git push --set-upstream origin $(git branch --show-current)
-            gh pr create -B main -H $(git branch --show-current) --title 'Merge updated docs into main' --body 'Created by Github action'
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}          
+        run: cargo clippy --all-targets --all-features     
 
   publish:
       name: Publish for ${{ matrix.os }}

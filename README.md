@@ -1,6 +1,6 @@
 # tcpperf
 
-Rust based toyproject for testing tcp network performance. 
+Rust based toy project for testing tcp network performance. 
 
 ## Installation
 
@@ -8,7 +8,7 @@ Rust based toyproject for testing tcp network performance.
 cargo run
 ```
 
-Download prebuilt package from releasese
+Download prebuilt package from releases.
 ```bash
 ./tcpperf
 ```
