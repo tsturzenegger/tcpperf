@@ -1,0 +1,104 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Set up cache
+        uses: Swatinem/rust-cache@v2
+        with: 
+          shared-key: "-"
+          key: "-"
+          cache-all-crates: true
+      - name: Build
+        run: cargo build --release --verbose
+      - name: Run tests
+        run: cargo test --verbose
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+
+  update-docs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Set up cache
+        uses: Swatinem/rust-cache@v2
+        with: 
+          shared-key: "-"
+          key: "-"
+          cache-all-crates: true
+      - name: Generate Documentation
+        run: cargo doc --no-deps
+      - name: Commit Documentation
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f target/doc
+          if git diff --staged --quiet; then
+            echo "No changes in documentation to commit."
+          else
+            git checkout -b update-docs-$(date +%Y%m%d-%H%M%S)
+            git commit -m "Generate and commit documentation"
+            git push --set-upstream origin $(git branch --show-current)
+            gh pr create -B main -H $(git branch --show-current) --title 'Merge updated docs into main' --body 'Created by Github action'
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}          
+
+  publish:
+      name: Publish for ${{ matrix.os }}
+      runs-on: ${{ matrix.os }}
+      if: github.event_name == 'push'
+      strategy:
+        matrix:
+          include:
+            - os: ubuntu-latest
+              artifact_name: punk
+              asset_name: punk-linux-amd64
+            - os: windows-latest
+              artifact_name: punk.exe
+              asset_name: punk-windows-amd64.exe
+            - os: macos-latest
+              artifact_name: punk
+              asset_name: punk-macos-amd64
+
+      steps:
+      - uses: actions/checkout@v4
+      - name: Set up toolchain
+        run: rustup toolchain install stable --profile minimal
+      - name: Set up cache
+        uses: Swatinem/rust-cache@v2
+        with: 
+          shared-key: "-"
+          key: "-"
+          cache-all-crates: true
+      - name: Build
+        run: cargo build --release --locked
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: target/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          tag: ${{ github.ref }}
+          overwrite: true
