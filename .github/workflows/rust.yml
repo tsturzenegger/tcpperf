@@ -41,14 +41,14 @@ jobs:
         matrix:
           include:
             - os: ubuntu-latest
-              artifact_name: punk
-              asset_name: punk-linux-amd64
+              artifact_name: tcpperf
+              asset_name: tcpperf-linux-amd64
             - os: windows-latest
-              artifact_name: punk.exe
-              asset_name: punk-windows-amd64.exe
+              artifact_name: tcpperf.exe
+              asset_name: tcpperf-windows-amd64.exe
             - os: macos-latest
-              artifact_name: punk
-              asset_name: punk-macos-amd64
+              artifact_name: tcpperf
+              asset_name: tcpperf-macos-amd64
 
       steps:
       - uses: actions/checkout@v4
