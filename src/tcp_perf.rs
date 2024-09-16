@@ -30,9 +30,11 @@ struct Cli {
     sample_size: u64,
 }
 
-/// This program performs network performance tests by sending and receiving data over TCP connections. 
-/// It can function in two modes: as a server or a client. The program uses asynchronous operations powered by Tokio and Clap for command line argument parsing. 
-/// Progress bars are used to provide feedback on data transfer rates. 
+/// # Overview
+///
+/// Performs network performance tests by sending and receiving data over TCP connections.
+/// It can function in two modes: as a server or a client. The program uses asynchronous operations powered by Tokio and Clap for command line argument parsing.
+/// Progress bars are used to provide feedback on data transfer rates.
 #[derive(Clone, Copy)]
 pub struct TcpPerf {
     mode: Mode,
