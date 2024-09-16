@@ -105,7 +105,8 @@ impl TcpPerf {
                     .write_all(&u64::to_le_bytes(self.sample_size))
                     .await?;
                 while byte_counter < self.sample_size {
-                    byte_counter += stream.write(&buf).await? as u64;
+                    stream.write_all(&buf).await?;
+                    byte_counter += buf.len() as u64;
                     pb.set(byte_counter);
                 }
                 pb.finish_println("finished uploading...\n");
@@ -115,7 +116,8 @@ impl TcpPerf {
                     .write_all(&u64::to_le_bytes(self.sample_size))
                     .await?;
                 while byte_counter < self.sample_size {
-                    byte_counter += stream.write(&buf).await? as u64;
+                    stream.write_all(&buf).await?;
+                    byte_counter += buf.len() as u64;
                 }
             }
         }
