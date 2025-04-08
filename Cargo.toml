@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.17", features = ["derive"] }
 pbr = "1.1.1"
-tokio = { version = "1.40.0", features = ["net", "io-util", "rt-multi-thread", "macros"] }
+tokio = { version = "1.43.1", features = ["net", "io-util", "rt-multi-thread", "macros"] }
